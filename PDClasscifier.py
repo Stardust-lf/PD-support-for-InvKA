@@ -4,13 +4,12 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold,GridSearchCV,StratifiedKFold,train_test_split
 import sklearn.metrics as metrics
-import seaborn as sns
 def load_variavle(filename):
   f=open(filename,'rb')
   r=pickle.load(f)
   f.close()
   return r
-plt.rc('font',family='Times New Roman')
+
 data = load_variavle('matrix64_PD_90')
 sample = load_variavle('matrix64_nm_90')
 y1 = [1]*len(data)
@@ -21,7 +20,7 @@ clf = LogisticRegression(max_iter=2000,C=100)
 y_true = np.array(y1+y2,dtype=np.int)
 full_data = np.concatenate([data,sample],axis=0)
 full_data = np.reshape(full_data,[len(full_data),-1])
-kf = KFold(n_splits=10, shuffle=True)
+kf = KFold(n_splits=5, shuffle=True)
 acc = []
 for train_index, test_index in kf.split(full_data, y_true):
     x_train = full_data[train_index]
@@ -33,10 +32,3 @@ for train_index, test_index in kf.split(full_data, y_true):
     clf.fit(x_train, y_train)
     acc.append(metrics.accuracy_score(y_test, clf.predict(x_test)))
 print('avg acc is', np.average(acc))
-print(clf.coef_.shape)
-plt.figure(dpi=1200)
-sns.heatmap(np.reshape(np.abs(clf.coef_),[64,64]),cmap='Oranges')
-plt.xticks([])
-plt.yticks([])
-plt.savefig('CLF_PD')
-#plt.show()
